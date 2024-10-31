@@ -14,9 +14,9 @@ import java.util.List;
 public class Breeder {
     @Id
     private ObjectId id;
-    protected String name;
-    protected String password;
-    protected String email;
+    private String name;
+    private String password;
+    private String email;
     private String doveCote;
     private String gpsCoordinates;
     @Field("pigeons")

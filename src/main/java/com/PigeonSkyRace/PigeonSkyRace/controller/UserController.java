@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.PigeonSkyRace.PigeonSkyRace.dto.UserRegistrationDto;
 import com.PigeonSkyRace.PigeonSkyRace.model.Breeder;
 import com.PigeonSkyRace.PigeonSkyRace.service.UserService;
+import org.springframework.web.server.ResponseStatusException;
 
 @RequestMapping("/api/users")
 @RestController
@@ -29,6 +30,12 @@ public class UserController {
         return ResponseEntity.ok(breeder);
     }
 
-
-    
+    @PostMapping("/login")
+    public ResponseEntity<Breeder> login(@RequestBody UserRegistrationDto registrationDTO) {
+        if (!userService.emailExists(registrationDTO.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
+        Breeder breeder = userService.login(registrationDTO.email(), registrationDTO.password());
+        return ResponseEntity.ok(breeder);
+    }
 }
