@@ -12,5 +12,4 @@ public class Pigeon {
     private String sex;
     private int age;
     private String color;
-    private String image;
 }
