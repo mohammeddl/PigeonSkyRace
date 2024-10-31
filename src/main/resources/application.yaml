@@ -4,7 +4,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://host:27017/SkyRace
+      uri: mongodb://localhost:27017/pigeon_competition_db
 server :
    port: 8082
 
