@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: PigeonSkyRace
+
+  data:
+    mongodb:
+      uri: mongodb://host:27017/SkyRace
+server :
+   port: 8082
+
