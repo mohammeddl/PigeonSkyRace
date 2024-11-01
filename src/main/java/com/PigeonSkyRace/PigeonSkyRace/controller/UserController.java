@@ -26,6 +26,9 @@ public class UserController {
         if (userService.emailExists(registrationDTO.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
         }
+        if(userService.gpsCoordinatesEsists(registrationDTO.getGpsCoordinates())){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("gps Coordinates already exists");
+        }
         Breeder breeder = userService.registerBreederWithPigeons(registrationDTO);
         return ResponseEntity.ok(breeder);
     }

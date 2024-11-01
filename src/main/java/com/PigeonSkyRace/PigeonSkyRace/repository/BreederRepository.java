@@ -6,5 +6,6 @@ import com.PigeonSkyRace.PigeonSkyRace.model.Breeder;
 
 public interface BreederRepository extends MongoRepository<Breeder, String> {
     boolean existsByEmail(String email);
+    boolean existsByGpsCoordinates(String existsByGpsCoordinates);
     Breeder findByEmail(String email);
 }

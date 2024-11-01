@@ -56,8 +56,13 @@ public class UserService {
         return breederRepository.existsByEmail(email);
     }
 
+    public boolean gpsCoordinatesEsists(String gpsCoordinates){
+        return breederRepository.existsByGpsCoordinates(gpsCoordinates);
+    }
+
     public Breeder login(String email, String password) {
-        if (validator.validateEmail(email) && validator.validatePassword(password) && breederRepository.existsByEmail(email)) {
+        if (validator.validateEmail(email) && validator.validatePassword(password)
+                && breederRepository.existsByEmail(email)) {
             Breeder breeder = breederRepository.findByEmail(email);
             if (passwordEncoder.matches(password, breeder.getPassword())) {
                 return breeder;
