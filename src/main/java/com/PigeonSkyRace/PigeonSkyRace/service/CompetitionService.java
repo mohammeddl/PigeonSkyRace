@@ -1,8 +1,11 @@
 package com.PigeonSkyRace.PigeonSkyRace.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.PigeonSkyRace.PigeonSkyRace.dto.ResultDto;
+import com.PigeonSkyRace.PigeonSkyRace.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +43,17 @@ public class CompetitionService {
         competition.setBreeders(breeders);
         return competitionRepository.save(competition);
     }
+    public List<ResultDto> closeCompetition(List<ResultDto> ResultsDtos) {
+        if (ResultsDtos.stream().allMatch(resultDto ->
+                validator.validateString(resultDto.pigeon())
+                        &&validator.validateDouble(resultDto.distance())
+                        &&validator.validateDouble(resultDto.flightTime())
+                        &&validator.validateDouble(resultDto.points())
+                        &&validator.validateDouble(resultDto.speed()))) {
+            List<Result> results = new ArrayList<>();
+            ResultsDtos.forEach(resultDto -> {results.add(new Result(resultDto.pigeon(),resultDto.distance() , resultDto.flightTime(),
+                    resultDto.speed() , resultDto.adjustmentCoefficient(), resultDto.points()));});
 
+        }
+    }
 }
