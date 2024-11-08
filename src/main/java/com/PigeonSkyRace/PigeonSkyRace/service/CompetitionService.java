@@ -1,11 +1,16 @@
 package com.PigeonSkyRace.PigeonSkyRace.service;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.PigeonSkyRace.PigeonSkyRace.dto.ResultDto;
+import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.CompetitionNotFinishedException;
+import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoCompetitionWasFound;
 import com.PigeonSkyRace.PigeonSkyRace.model.Result;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,19 +46,30 @@ public class CompetitionService {
         competition.setDepartureTime(competitionDto.departureTime());
         competition.setDistance(competitionDto.distance());
         competition.setBreeders(breeders);
+        competition.setDuration(competitionDto.duration());
+        competition.setStatus("open");
         return competitionRepository.save(competition);
     }
-    public List<ResultDto> closeCompetition(List<ResultDto> ResultsDtos) {
+    public List<ResultDto> closeCompetition(List<ResultDto> ResultsDtos , String competitionID) {
+        Competition competition = competitionRepository.findById(competitionID).orElseThrow(()->new NoCompetitionWasFound("with the following ID :"+competitionID));
+        LocalTime competitionTime = (LocalTime) competition.getDuration().addTo(competition.getDepartureTime());
         if (ResultsDtos.stream().allMatch(resultDto ->
                 validator.validateString(resultDto.pigeon())
                         &&validator.validateDouble(resultDto.distance())
                         &&validator.validateDouble(resultDto.flightTime())
                         &&validator.validateDouble(resultDto.points())
                         &&validator.validateDouble(resultDto.speed()))) {
+            if (!competitionTime.equals(LocalTime.now())){
+                throw new CompetitionNotFinishedException("Competition" + competition.getRaceName() + "have not finished yet");
+            }
             List<Result> results = new ArrayList<>();
             ResultsDtos.forEach(resultDto -> {results.add(new Result(resultDto.pigeon(),resultDto.distance() , resultDto.flightTime(),
                     resultDto.speed() , resultDto.adjustmentCoefficient(), resultDto.points()));});
 
         }
+    }
+    public List<Double> calcPoints(List<ResultDto> resultDtos){
+        double speedMean =
+        return resultDtos.stream().
     }
 }
