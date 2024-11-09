@@ -1,6 +1,7 @@
 package com.PigeonSkyRace.PigeonSkyRace.exception;
 
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.CompetitionNotFinishedException;
+import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NegativeDurationException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoCompetitionWasFound;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoUserWasFoundException;
 import org.springframework.http.HttpStatus;
@@ -26,5 +27,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoCompetitionWasFound.class)
     public ResponseEntity<String> handleCompetitionNotFoundException(NoCompetitionWasFound ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Competition not found" + ex.getMessage());
+    }
+    @ExceptionHandler(NegativeDurationException.class)
+    public ResponseEntity<String> handleNegativeDurationException(NegativeDurationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

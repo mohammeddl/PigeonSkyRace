@@ -1,5 +1,6 @@
 package com.PigeonSkyRace.PigeonSkyRace.service;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 import com.PigeonSkyRace.PigeonSkyRace.dto.PigeonsResultsDto;
 import com.PigeonSkyRace.PigeonSkyRace.dto.ResultDto;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.CompetitionNotFinishedException;
+import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NegativeDurationException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoCompetitionWasFound;
 import com.PigeonSkyRace.PigeonSkyRace.helper.GpsCoordinatesHelper;
 import com.PigeonSkyRace.PigeonSkyRace.helper.HaversineFormula;
@@ -16,6 +18,7 @@ import com.PigeonSkyRace.PigeonSkyRace.model.Pigeon;
 import com.PigeonSkyRace.PigeonSkyRace.model.Result;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.PigeonSkyRace.PigeonSkyRace.dto.CompetitionDto;
@@ -87,5 +90,18 @@ public class CompetitionService {
         double a = HaversineFormula.haversine(dLat) + Math.cos(releaseLatitude) * Math.cos(arrivalLatitude) * HaversineFormula.haversine(dLong);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
+    }
+    public Duration calcFlightTime(PigeonsResultsDto pigeonsResultsDto , Competition competition) {
+        LocalTime arrivalTime = pigeonsResultsDto.arrivalTime();
+        LocalTime departureTime = competition.getDepartureTime();
+        if (arrivalTime.isAfter(departureTime)) {
+        Duration flightDuration = Duration.between(departureTime, arrivalTime);
+        return flightDuration ;
+        }else{
+            throw new NegativeDurationException("arrival time :" + arrivalTime + "cannot be after departure time:" + departureTime);
+        }
+    }
+    public double calcSpeed(){
+
     }
 }
