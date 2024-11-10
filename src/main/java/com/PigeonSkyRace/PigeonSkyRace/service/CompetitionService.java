@@ -76,7 +76,21 @@ public class CompetitionService {
 //        }
     }
     public List<Result> calcResults(List<PigeonsResultsDto> pigeonsResultsDtos , Competition competition) {
-
+        List<Result> results = new ArrayList<>();
+        pigeonsResultsDtos.forEach(pigeonsResultsDto -> {
+            Result result = new Result();
+            double distance = calcDistance(pigeonsResultsDto.pigeon(), competition);
+            result.setDistance(distance);
+            result.setPigeon(pigeonsResultsDto.pigeon().getRingNumber());
+            Duration FlightTime = calcFlightTime(pigeonsResultsDto , competition);
+            result.setFlightTime(FlightTime);
+            double adjustCoeff = calcAdjustmnetCoeff(distance , competition);
+            result.setAdjustmentCoefficient(adjustCoeff);
+            double speed = calcSpeed(distance , FlightTime , adjustCoeff);
+            result.setSpeed(speed);
+            results.add(result);
+        });
+        return results;
     }
     public double calcDistance(Pigeon pigeon , Competition competition){
         double arrivalLongitude = GpsCoordinatesHelper.getLongitude(competition.getReleasePointGps());
