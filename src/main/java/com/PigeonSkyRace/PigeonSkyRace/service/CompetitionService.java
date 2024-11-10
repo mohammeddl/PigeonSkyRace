@@ -101,7 +101,10 @@ public class CompetitionService {
             throw new NegativeDurationException("arrival time :" + arrivalTime + "cannot be after departure time:" + departureTime);
         }
     }
-    public double calcSpeed(){
-
+    public double calcSpeed(double distance , Duration flightDuration , double adjustementCoeff) {
+        return (distance/flightDuration.toMinutes()) * adjustementCoeff ;
+    }
+    public double calcAdjustmnetCoeff(double pigeonDistance ,Competition competition ){
+        return competition.getDistance()/pigeonDistance;
     }
 }
