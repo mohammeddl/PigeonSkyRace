@@ -57,25 +57,11 @@ public class CompetitionService {
         competition.setStatus("open");
         return competitionRepository.save(competition);
     }
-    public List<PigeonsResultsDto> closeCompetition(List<PigeonsResultsDto> pigeonsResultsDtos , String competitionID) {
+    public List<Result> closeCompetition(List<PigeonsResultsDto> pigeonsResultsDtos , String competitionID) {
         Competition competition = competitionRepository.findById(competitionID).orElseThrow(()->new NoCompetitionWasFound("with the following ID :"+competitionID));
         LocalTime competitionTime = (LocalTime) competition.getDuration().addTo(competition.getDepartureTime());
-//        if (ResultsDtos.stream().allMatch(resultDto ->
-//                validator.validateString(resultDto.pigeon())
-//                        &&validator.validateDouble(resultDto.distance())
-//                        &&validator.validateDouble(resultDto.flightTime())
-//                        &&validator.validateDouble(resultDto.points())
-//                        &&validator.validateDouble(resultDto.speed()))) {
-//            if (!competitionTime.equals(LocalTime.now())){
-//                throw new CompetitionNotFinishedException("Competition" + competition.getRaceName() + "have not finished yet");
-//            }
-//            List<Result> results = new ArrayList<>();
-//            ResultsDtos.forEach(resultDto -> {results.add(new Result(resultDto.pigeon(),resultDto.distance() , resultDto.flightTime(),
-//                    resultDto.speed() , resultDto.adjustmentCoefficient(), resultDto.points()));});
-//
-//        }
+      return calcResults(pigeonsResultsDtos ,competition);
     }
-
     public List<Result> calcResults(List<PigeonsResultsDto> pigeonsResultsDtos , Competition competition) {
         List<Result> results = new ArrayList<>();
         pigeonsResultsDtos.forEach(pigeonsResultsDto -> {
