@@ -30,6 +30,7 @@ import com.PigeonSkyRace.PigeonSkyRace.repository.CompetitionRepository;
 @Service
 public class CompetitionService {
 
+    private static final double EARTH_RADIUS = 6371 ;
     @Autowired
     private CompetitionRepository competitionRepository;
 
@@ -38,7 +39,6 @@ public class CompetitionService {
 
     @Autowired
     private Validator validator;
-    private static final double EARTH_RADIUS = 6371 ;
     public Competition createCompetition(CompetitionDto competitionDto) {
         if(!validator.validateDepartureDate(competitionDto.departureDate())) {
             throw new IllegalArgumentException("Departure date cannot be in the session");
