@@ -57,26 +57,32 @@ public class CompetitionService {
         competition.setStatus("open");
         return competitionRepository.save(competition);
     }
-    public List<PigeonsResultsDto> closeCompetition(List<PigeonsResultsDto> pigeonsResultsDtos , String competitionID) {
+    public List<Result> closeCompetition(List<PigeonsResultsDto> pigeonsResultsDtos , String competitionID) {
         Competition competition = competitionRepository.findById(competitionID).orElseThrow(()->new NoCompetitionWasFound("with the following ID :"+competitionID));
         LocalTime competitionTime = (LocalTime) competition.getDuration().addTo(competition.getDepartureTime());
-//        if (ResultsDtos.stream().allMatch(resultDto ->
-//                validator.validateString(resultDto.pigeon())
-//                        &&validator.validateDouble(resultDto.distance())
-//                        &&validator.validateDouble(resultDto.flightTime())
-//                        &&validator.validateDouble(resultDto.points())
-//                        &&validator.validateDouble(resultDto.speed()))) {
-//            if (!competitionTime.equals(LocalTime.now())){
-//                throw new CompetitionNotFinishedException("Competition" + competition.getRaceName() + "have not finished yet");
-//            }
-//            List<Result> results = new ArrayList<>();
-//            ResultsDtos.forEach(resultDto -> {results.add(new Result(resultDto.pigeon(),resultDto.distance() , resultDto.flightTime(),
-//                    resultDto.speed() , resultDto.adjustmentCoefficient(), resultDto.points()));});
-//
-//        }
+      return calcResults(pigeonsResultsDtos ,competition);
     }
     public List<Result> calcResults(List<PigeonsResultsDto> pigeonsResultsDtos , Competition competition) {
-
+        List<Result> results = new ArrayList<>();
+        pigeonsResultsDtos.forEach(pigeonsResultsDto -> {
+            Result result = new Result();
+            double distance = calcDistance(pigeonsResultsDto.pigeon(), competition);
+            result.setDistance(distance);
+            result.setPigeon(pigeonsResultsDto.pigeon().getRingNumber());
+            Duration FlightTime = calcFlightTime(pigeonsResultsDto , competition);
+            result.setFlightTime(FlightTime);
+            double adjustCoeff = calcAdjustmnetCoeff(distance , competition);
+            result.setAdjustmentCoefficient(adjustCoeff);
+            double speed = calcSpeed(distance , FlightTime , adjustCoeff);
+            result.setSpeed(speed);
+            results.add(result);
+        });
+        double speedAverage = calcSpeedAverage(results);
+        results.stream().forEach(result -> {
+            double points = calcPoints(speedAverage ,result.getSpeed());
+            result.setPoints(points);
+        });
+        return results;
     }
     public double calcDistance(Pigeon pigeon , Competition competition){
         double arrivalLongitude = GpsCoordinatesHelper.getLongitude(competition.getReleasePointGps());
@@ -101,7 +107,17 @@ public class CompetitionService {
             throw new NegativeDurationException("arrival time :" + arrivalTime + "cannot be after departure time:" + departureTime);
         }
     }
-    public double calcSpeed(){
-
+    public double calcSpeed(double distance , Duration flightDuration , double adjustementCoeff) {
+        return (distance/flightDuration.toMinutes()) * adjustementCoeff ;
+    }
+    public double calcAdjustmnetCoeff(double pigeonDistance ,Competition competition ){
+        return competition.getDistance()/pigeonDistance;
+    }
+    public double calcSpeedAverage(List<Result> results){
+        double totalSpeed = results.stream().mapToDouble(result-> result.getSpeed()).sum();
+        return totalSpeed / results.size();
+    }
+    public double calcPoints(double averageSpeed , double speed){
+        return (speed / averageSpeed)*100;
     }
 }
