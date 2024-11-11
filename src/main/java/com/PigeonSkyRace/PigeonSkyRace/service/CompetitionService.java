@@ -75,6 +75,7 @@ public class CompetitionService {
 //
 //        }
     }
+
     public List<Result> calcResults(List<PigeonsResultsDto> pigeonsResultsDtos , Competition competition) {
         List<Result> results = new ArrayList<>();
         pigeonsResultsDtos.forEach(pigeonsResultsDto -> {
@@ -89,6 +90,11 @@ public class CompetitionService {
             double speed = calcSpeed(distance , FlightTime , adjustCoeff);
             result.setSpeed(speed);
             results.add(result);
+        });
+        double speedAverage = calcSpeedAverage(results);
+        results.stream().forEach(result -> {
+            double points = calcPoints(speedAverage ,result.getSpeed());
+            result.setPoints(points);
         });
         return results;
     }
@@ -120,5 +126,12 @@ public class CompetitionService {
     }
     public double calcAdjustmnetCoeff(double pigeonDistance ,Competition competition ){
         return competition.getDistance()/pigeonDistance;
+    }
+    public double calcSpeedAverage(List<Result> results){
+        double totalSpeed = results.stream().mapToDouble(result-> result.getSpeed()).sum();
+        return totalSpeed / results.size();
+    }
+    public double calcPoints(double averageSpeed , double speed){
+        return (speed / averageSpeed)*100;
     }
 }
