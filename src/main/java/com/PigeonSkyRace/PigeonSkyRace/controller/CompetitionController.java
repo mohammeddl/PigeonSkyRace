@@ -1,6 +1,8 @@
 package com.PigeonSkyRace.PigeonSkyRace.controller;
 
+import com.PigeonSkyRace.PigeonSkyRace.dto.PigeonsResultsDto;
 import com.PigeonSkyRace.PigeonSkyRace.dto.ResultDto;
+import com.PigeonSkyRace.PigeonSkyRace.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +28,8 @@ public class CompetitionController {
     }
 
     @PostMapping("/close")
-    public Competition closeCompetition(@RequestBody List<ResultDto> ResultDtos) {
-
+    public List<Result> closeCompetition(@RequestBody List<PigeonsResultsDto> resultDtos , String competitionID) {
+        return competitionService.closeCompetition(resultDtos,competitionID);
     }
     
 }
