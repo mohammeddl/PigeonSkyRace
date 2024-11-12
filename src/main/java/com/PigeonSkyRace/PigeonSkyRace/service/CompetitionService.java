@@ -14,8 +14,8 @@ import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.Negativ
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoCompetitionWasFound;
 import com.PigeonSkyRace.PigeonSkyRace.helper.GpsCoordinatesHelper;
 import com.PigeonSkyRace.PigeonSkyRace.helper.HaversineFormula;
-import com.PigeonSkyRace.PigeonSkyRace.model.Pigeon;
-import com.PigeonSkyRace.PigeonSkyRace.model.Result;
+import com.PigeonSkyRace.PigeonSkyRace.model.*;
+import com.PigeonSkyRace.PigeonSkyRace.repository.PigeonsRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import com.PigeonSkyRace.PigeonSkyRace.dto.CompetitionDto;
 import com.PigeonSkyRace.PigeonSkyRace.helper.Validator;
-import com.PigeonSkyRace.PigeonSkyRace.model.Competition;
 import com.PigeonSkyRace.PigeonSkyRace.repository.BreederRepository;
 import com.PigeonSkyRace.PigeonSkyRace.repository.CompetitionRepository;
 
@@ -36,6 +35,9 @@ public class CompetitionService {
 
     @Autowired
     private BreederRepository breederRepository;
+
+    @Autowired
+    private PigeonsRepository pigeonsRepository;
 
     @Autowired
     private Validator validator;
@@ -57,18 +59,20 @@ public class CompetitionService {
         competition.setStatus("open");
         return competitionRepository.save(competition);
     }
-    public List<Result> closeCompetition(List<PigeonsResultsDto> pigeonsResultsDtos , String competitionID) {
+    public List<Result> closeCompetition(List<PigeonResults> pigeonsResults) {
+        String competitionID = pigeonsResults.get(0).getCompetitionID();
         Competition competition = competitionRepository.findById(competitionID).orElseThrow(()->new NoCompetitionWasFound("with the following ID :"+competitionID));
         LocalTime competitionTime = (LocalTime) competition.getDuration().addTo(competition.getDepartureTime());
-      return calcResults(pigeonsResultsDtos ,competition);
+      return calcResults(pigeonsResults ,competition);
     }
-    public List<Result> calcResults(List<PigeonsResultsDto> pigeonsResultsDtos , Competition competition) {
+    public List<Result> calcResults(List<PigeonResults> pigeonsResultsDtos , Competition competition) {
         List<Result> results = new ArrayList<>();
         pigeonsResultsDtos.forEach(pigeonsResultsDto -> {
             Result result = new Result();
-            double distance = calcDistance(pigeonsResultsDto.pigeon(), competition);
+            Pigeon pigeon = pigeonsRepository.findById(pigeonsResultsDto.getPigeon()).orElseThrow();
+            double distance = calcDistance(pigeon, competition);
             result.setDistance(distance);
-            result.setPigeon(pigeonsResultsDto.pigeon().getRingNumber());
+            result.setPigeon(pigeon.getRingNumber());
             Duration FlightTime = calcFlightTime(pigeonsResultsDto , competition);
             result.setFlightTime(FlightTime);
             double adjustCoeff = calcAdjustmnetCoeff(distance , competition);
@@ -85,10 +89,11 @@ public class CompetitionService {
         return results;
     }
     public double calcDistance(Pigeon pigeon , Competition competition){
+        Breeder breeder = breederRepository.findByPigeonId(pigeon.getBreeder()).orElseThrow();
         double arrivalLongitude = GpsCoordinatesHelper.getLongitude(competition.getReleasePointGps());
         double arrivalLatitude = GpsCoordinatesHelper.getLatitude(competition.getReleasePointGps());
-        double releaseLongitude = GpsCoordinatesHelper.getLongitude(pigeon.getBreeder().getGpsCoordinates());
-        double releaseLatitude = GpsCoordinatesHelper.getLatitude(pigeon.getBreeder().getGpsCoordinates());
+        double releaseLongitude = GpsCoordinatesHelper.getLongitude(breeder.getGpsCoordinates());
+        double releaseLatitude = GpsCoordinatesHelper.getLatitude(breeder.getGpsCoordinates());
         double dLat = Math.toRadians((arrivalLatitude - releaseLatitude));
         double dLong = Math.toRadians((arrivalLongitude - releaseLongitude));
         releaseLatitude = Math.toRadians(releaseLatitude);
@@ -97,8 +102,8 @@ public class CompetitionService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
     }
-    public Duration calcFlightTime(PigeonsResultsDto pigeonsResultsDto , Competition competition) {
-        LocalTime arrivalTime = pigeonsResultsDto.arrivalTime();
+    public Duration calcFlightTime(PigeonResults pigeonsResults , Competition competition) {
+        LocalTime arrivalTime = pigeonsResults.getArrivalTime();
         LocalTime departureTime = competition.getDepartureTime();
         if (arrivalTime.isAfter(departureTime)) {
         Duration flightDuration = Duration.between(departureTime, arrivalTime);
@@ -108,7 +113,7 @@ public class CompetitionService {
         }
     }
     public double calcSpeed(double distance , Duration flightDuration , double adjustementCoeff) {
-        return (distance/flightDuration.toMinutes()) * adjustementCoeff ;
+        return (distance/flightDuration.toHours()) * adjustementCoeff ;
     }
     public double calcAdjustmnetCoeff(double pigeonDistance ,Competition competition ){
         return competition.getDistance()/pigeonDistance;

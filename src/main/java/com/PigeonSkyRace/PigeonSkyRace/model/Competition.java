@@ -27,6 +27,5 @@ public class Competition {
     private Duration duration;
     private double distance;
     @Field("breeders")
-    @DBRef
     private List<String> breeders;
 }

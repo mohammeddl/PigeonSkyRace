@@ -21,6 +21,5 @@ public class Breeder {
     private String doveCote;
     private String gpsCoordinates;
     @Field("pigeons")
-    @DBRef
     private List<String> pigeonIds;
 }
