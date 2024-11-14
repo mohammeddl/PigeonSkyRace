@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoUserWasFoundException;
 import com.PigeonSkyRace.PigeonSkyRace.helper.Validator;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

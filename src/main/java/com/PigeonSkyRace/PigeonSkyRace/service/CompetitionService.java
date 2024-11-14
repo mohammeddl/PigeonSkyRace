@@ -4,21 +4,15 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.PigeonSkyRace.PigeonSkyRace.dto.PigeonsResultsDto;
-import com.PigeonSkyRace.PigeonSkyRace.dto.ResultDto;
-import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.CompetitionNotFinishedException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NegativeDurationException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoCompetitionWasFound;
 import com.PigeonSkyRace.PigeonSkyRace.helper.GpsCoordinatesHelper;
 import com.PigeonSkyRace.PigeonSkyRace.helper.HaversineFormula;
 import com.PigeonSkyRace.PigeonSkyRace.model.*;
 import com.PigeonSkyRace.PigeonSkyRace.repository.PigeonsRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.PigeonSkyRace.PigeonSkyRace.dto.CompetitionDto;

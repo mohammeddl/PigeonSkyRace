@@ -1,7 +1,6 @@
 package com.PigeonSkyRace.PigeonSkyRace.controller;
 
-import com.PigeonSkyRace.PigeonSkyRace.dto.PigeonsResultsDto;
-import com.PigeonSkyRace.PigeonSkyRace.dto.ResultDto;
+
 import com.PigeonSkyRace.PigeonSkyRace.model.PigeonResults;
 import com.PigeonSkyRace.PigeonSkyRace.model.Result;
 import org.springframework.beans.factory.annotation.Autowired;
