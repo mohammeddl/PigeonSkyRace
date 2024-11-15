@@ -34,4 +34,5 @@ public class CompetitionController {
     public double distance(@RequestBody GpsPointDto gpsPointDto) {
         return competitionService.calcDistance(gpsPointDto.releasePoint(), gpsPointDto.arrivalPoint());
     }
+
 }
