@@ -4,4 +4,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.PigeonSkyRace.PigeonSkyRace.model.Ranking;
 
-public interface RankingRepository extends MongoRepository<Ranking, String> {}
+import java.util.List;
+
+public interface RankingRepository extends MongoRepository<Ranking, String> {
+    List<Ranking> findRankingByCompetitionId(String pigeonId);
+}

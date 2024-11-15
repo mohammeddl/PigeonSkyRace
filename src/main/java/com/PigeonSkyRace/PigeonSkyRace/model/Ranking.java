@@ -10,9 +10,9 @@ import java.util.List;
 @Data
 @Document("rankings")
 public class Ranking {
-    @Id
-    private int id;
-    private int competition;
-    @Field("results")
-    private List<String> results;
+    private String competition;
+    private String breederName;
+    private String doveCote;
+    private Pigeon pigeon;
+    private double speed;
 }

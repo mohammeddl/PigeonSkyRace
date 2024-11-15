@@ -4,28 +4,21 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.PigeonSkyRace.PigeonSkyRace.dto.PigeonsResultsDto;
-import com.PigeonSkyRace.PigeonSkyRace.dto.ResultDto;
-import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.CompetitionNotFinishedException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NegativeDurationException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NoCompetitionWasFound;
 import com.PigeonSkyRace.PigeonSkyRace.helper.GpsCoordinatesHelper;
 import com.PigeonSkyRace.PigeonSkyRace.helper.HaversineFormula;
 import com.PigeonSkyRace.PigeonSkyRace.model.*;
 import com.PigeonSkyRace.PigeonSkyRace.repository.PigeonsRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.PigeonSkyRace.PigeonSkyRace.dto.CompetitionDto;
 import com.PigeonSkyRace.PigeonSkyRace.helper.Validator;
 import com.PigeonSkyRace.PigeonSkyRace.repository.BreederRepository;
 import com.PigeonSkyRace.PigeonSkyRace.repository.CompetitionRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CompetitionService {
@@ -39,6 +32,9 @@ public class CompetitionService {
 
     @Autowired
     private PigeonsRepository pigeonsRepository;
+
+    @Autowired
+    private RankingService rankingService;
 
     @Autowired
     private Validator validator;
@@ -89,6 +85,7 @@ public class CompetitionService {
             double points = calcPoints(speedAverage ,result.getSpeed());
             result.setPoints(points);
         });
+        rankingService.saveRankings(competition , results);
         return results;
     }
     public double calcDistance(Pigeon pigeon , Competition competition){
@@ -142,5 +139,6 @@ public class CompetitionService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return EARTH_RADIUS * c;
     }
+
 
 }
