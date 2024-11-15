@@ -21,4 +21,7 @@ public class Pigeon {
         this.color = color;
     }
 
+    public Pigeon() {
+    }
+
 }

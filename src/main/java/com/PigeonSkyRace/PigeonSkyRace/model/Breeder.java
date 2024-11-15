@@ -21,4 +21,11 @@ public class Breeder {
     private String gpsCoordinates;
     @Field("pigeons")
     private List<String> pigeonIds;
+
+    public Breeder(String name, String email, String gpsCoordinates) {
+        this.name = name;
+        this.email = email;
+        this.gpsCoordinates = gpsCoordinates;
+    }
+    public Breeder(){}
 }

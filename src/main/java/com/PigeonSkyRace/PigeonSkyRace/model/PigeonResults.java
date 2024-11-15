@@ -15,4 +15,10 @@ public class PigeonResults {
     private String pigeon ;
     private LocalTime arrivalTime ;
     private String competitionID;
+
+    public PigeonResults(String competitionID, String pigeon, LocalTime arrivalTime) {
+        this.pigeon = pigeon;
+        this.arrivalTime = arrivalTime;
+        this.competitionID = competitionID;
+    }
 }
