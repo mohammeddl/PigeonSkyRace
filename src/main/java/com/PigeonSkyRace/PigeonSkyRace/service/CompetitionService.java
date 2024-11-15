@@ -25,6 +25,7 @@ import com.PigeonSkyRace.PigeonSkyRace.dto.CompetitionDto;
 import com.PigeonSkyRace.PigeonSkyRace.helper.Validator;
 import com.PigeonSkyRace.PigeonSkyRace.repository.BreederRepository;
 import com.PigeonSkyRace.PigeonSkyRace.repository.CompetitionRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CompetitionService {
@@ -63,7 +64,9 @@ public class CompetitionService {
         String competitionID = pigeonsResults.get(0).getCompetitionID();
         Competition competition = competitionRepository.findById(competitionID).orElseThrow(()->new NoCompetitionWasFound("with the following ID :"+competitionID));
         LocalTime competitionTime = (LocalTime) competition.getDuration().addTo(competition.getDepartureTime());
-      return calcResults(pigeonsResults ,competition);
+        competition.setStatus("closed");
+        competitionRepository.save(competition);
+        return calcResults(pigeonsResults ,competition);
     }
     public List<Result> calcResults(List<PigeonResults> pigeonsResultsDtos , Competition competition) {
         List<Result> results = new ArrayList<>();
@@ -113,7 +116,7 @@ public class CompetitionService {
         }
     }
     public double calcSpeed(double distance , Duration flightDuration , double adjustementCoeff) {
-        return (distance/flightDuration.toHours()) * adjustementCoeff ;
+        return (distance/flightDuration.toMinutes()) * adjustementCoeff ;
     }
     public double calcAdjustmnetCoeff(double pigeonDistance ,Competition competition ){
         return competition.getDistance()/pigeonDistance;
@@ -124,5 +127,19 @@ public class CompetitionService {
     }
     public double calcPoints(double averageSpeed , double speed){
         return (speed / averageSpeed)*100;
+    }
+
+    public double calcDistance(String releasePoint, String arrivalPoint){
+        double arrivalLongitude = GpsCoordinatesHelper.getLongitude(arrivalPoint);
+        double arrivalLatitude = GpsCoordinatesHelper.getLatitude(arrivalPoint);
+        double releaseLongitude = GpsCoordinatesHelper.getLongitude(releasePoint);
+        double releaseLatitude = GpsCoordinatesHelper.getLatitude(releasePoint);
+        double dLat = Math.toRadians((arrivalLatitude - releaseLatitude));
+        double dLong = Math.toRadians((arrivalLongitude - releaseLongitude));
+        releaseLatitude = Math.toRadians(releaseLatitude);
+        arrivalLatitude = Math.toRadians(arrivalLatitude);
+        double a = HaversineFormula.haversine(dLat) + Math.cos(releaseLatitude) * Math.cos(arrivalLatitude) * HaversineFormula.haversine(dLong);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS * c;
     }
 }

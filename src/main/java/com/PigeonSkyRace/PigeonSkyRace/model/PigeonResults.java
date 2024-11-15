@@ -11,8 +11,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PigeonResults {
-    @DBRef
-    private String pigeon ;
-    private LocalTime arrivalTime ;
+    private String pigeon;
+    private LocalTime arrivalTime;
     private String competitionID;
 }

@@ -14,8 +14,6 @@ import java.time.Duration;
 @NoArgsConstructor
 @Document("results")
 public class Result {
-    @Id
-    private String id;
     @DBRef
     private String pigeon;
     private double distance;
