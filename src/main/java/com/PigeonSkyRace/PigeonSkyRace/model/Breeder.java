@@ -4,7 +4,6 @@ import lombok.Data;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -22,4 +21,13 @@ public class Breeder {
     private String gpsCoordinates;
     @Field("pigeons")
     private List<String> pigeonIds;
+
+    public Breeder(String name, String password, String email, String gpsCoordinates) {
+        this.name = name;
+        this.email = email;
+        this.gpsCoordinates = gpsCoordinates;
+    }
+
+    public Breeder() {
+    }
 }
