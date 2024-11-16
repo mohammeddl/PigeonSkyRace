@@ -22,11 +22,6 @@ public class Result {
     private double adjustmentCoefficient;
     private double points;
 
-    public Result(){
-
-    }
-    public Result(String pigeon, double distance, double v, double speed, double v1, double points) {
-    }
 
     public String getPigeon() {
         return pigeon;

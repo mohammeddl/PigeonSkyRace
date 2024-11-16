@@ -11,8 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.PigeonSkyRace.PigeonSkyRace.dto.UserRegistrationDto;
 import com.PigeonSkyRace.PigeonSkyRace.model.Breeder;
 import com.PigeonSkyRace.PigeonSkyRace.service.UserService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 import org.springframework.web.server.ResponseStatusException;
 
+@Api(value = "User API", description = "Operations related to user management")
 @RequestMapping("/api/users")
 @RestController
 public class UserController {
@@ -21,6 +26,7 @@ public class UserController {
     private UserService userService;
 
 
+    @ApiOperation(value = "Register a new user", notes = "Register a new breeder with pigeons")
     @PostMapping("/register")
     public ResponseEntity<?> registerBreederWithPigeons(@RequestBody UserRegistrationDto registrationDTO) {
         if (userService.emailExists(registrationDTO.getEmail())) {
@@ -33,6 +39,7 @@ public class UserController {
         return ResponseEntity.ok(breeder);
     }
 
+    @ApiOperation(value = "User login", notes = "Authenticate a user with email and password")
     @PostMapping("/login")
     public ResponseEntity<Breeder> login(@RequestBody UserRegistrationDto registrationDTO) {
         if (!userService.emailExists(registrationDTO.getEmail())) {

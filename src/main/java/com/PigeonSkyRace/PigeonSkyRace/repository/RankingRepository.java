@@ -1,6 +1,5 @@
 package com.PigeonSkyRace.PigeonSkyRace.repository;
 
-import com.PigeonSkyRace.PigeonSkyRace.model.Competition;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.PigeonSkyRace.PigeonSkyRace.model.Ranking;
