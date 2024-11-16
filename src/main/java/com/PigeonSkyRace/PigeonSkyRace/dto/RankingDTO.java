@@ -2,7 +2,8 @@ package com.PigeonSkyRace.PigeonSkyRace.dto;
 
 import com.PigeonSkyRace.PigeonSkyRace.model.Breeder;
 import com.PigeonSkyRace.PigeonSkyRace.model.Competition;
+import com.PigeonSkyRace.PigeonSkyRace.model.Pigeon;
 import com.PigeonSkyRace.PigeonSkyRace.model.Result;
 
-public record RankingDTO(Breeder breeder , Result result , Competition competition){
+public record RankingDTO(Competition competition , String breederName , String doveCote , Pigeon pigeon , double speed){
 }
