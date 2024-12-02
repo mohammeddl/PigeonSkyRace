@@ -17,7 +17,6 @@ import java.util.List;
 public class RankingController {
     @Autowired
     private RankingService rankingService;
-
     @ApiOperation(value = "Get rankings", notes = "Retrieve rankings based on competition ID")
     @GetMapping("/get")
     public List<RankingDTO> getRankings(@RequestParam String competitionID) {
