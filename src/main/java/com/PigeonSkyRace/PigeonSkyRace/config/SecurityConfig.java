@@ -38,8 +38,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("api/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/organizer/**").hasRole("ORGANIZER")
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/organizer/**").hasAuthority("ORGANIZER")
                         .requestMatchers("/api/pigeons/**").hasAuthority("USER")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())

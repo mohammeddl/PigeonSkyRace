@@ -15,11 +15,4 @@ import java.util.List;
 @DiscriminatorValue("ADMIN")
 public class Admin extends User {
 
-    private String role = "ADMIN";
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
-    }
-
 }

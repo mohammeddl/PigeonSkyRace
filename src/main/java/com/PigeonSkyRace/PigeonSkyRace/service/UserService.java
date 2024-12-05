@@ -9,6 +9,7 @@ import com.PigeonSkyRace.PigeonSkyRace.Mapper.UserMapper;
 import com.PigeonSkyRace.PigeonSkyRace.dto.request.UserRequest;
 import com.PigeonSkyRace.PigeonSkyRace.dto.response.LoginResponse;
 import com.PigeonSkyRace.PigeonSkyRace.dto.response.UserResponse;
+import com.PigeonSkyRace.PigeonSkyRace.dto.update.UserUpdate;
 import com.PigeonSkyRace.PigeonSkyRace.enums.Role;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.UsernameAlreadyExistsException;
 import com.PigeonSkyRace.PigeonSkyRace.model.RoleEntity;
@@ -64,14 +65,22 @@ public class UserService {
 
     }
 
-    public UserResponse updateUserRole(Long userId, String roleName) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        RoleEntity newRole = roleRepository.findByRoleName(Role.valueOf(roleName))
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-        user.getAuthorities().clear();
-        user.setAuthorities(newRole);
-
+    public UserResponse updateUser(Long userId, UserUpdate userUpdate) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (userUpdate.email() != null && !userUpdate.email().isEmpty()) {
+            user.setEmail(userUpdate.email());
+        }
+        if (userUpdate.password() != null && !userUpdate.password().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userUpdate.password())); 
+        }
+        if (userUpdate.role() != null && !userUpdate.role().isEmpty()) {
+            RoleEntity newRole = roleRepository.findByRoleName(Role.valueOf(userUpdate.role()))
+                    .orElseThrow(() -> new RuntimeException("Role not found"));
+            user.setAuthorities(newRole);
+        }
         userRepository.save(user);
         return userMapper.userEntityToUserResponse(user);
     }
+
 }
