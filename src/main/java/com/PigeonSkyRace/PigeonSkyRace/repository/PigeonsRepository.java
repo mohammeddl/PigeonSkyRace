@@ -1,8 +1,15 @@
 package com.PigeonSkyRace.PigeonSkyRace.repository;
 
 import com.PigeonSkyRace.PigeonSkyRace.model.Pigeon;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 
-public interface PigeonsRepository extends MongoRepository<Pigeon, String> {
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+
+
+public interface PigeonsRepository extends JpaRepository<Pigeon, String> {
+Page<Pigeon> findAll(Pageable pageable);
 }

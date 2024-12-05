@@ -1,23 +1,31 @@
 package com.PigeonSkyRace.PigeonSkyRace.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.*;
 
 @Data
-@Document("pigeons")
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "pigeons")
 public class Pigeon {
-    @Id
-    private String ringNumber;
-    private String sex;
-    private int age;
-    private String color;
-    private String breeder;
 
-    public Pigeon(String ringNumber,String sex, int age, String color) {
-        this.ringNumber = ringNumber;
-        this.sex = sex;
-        this.age = age;
-        this.color = color;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ringNumber;
+    private LocalDate birthDate;
+    private String sex;
+    private String color;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }

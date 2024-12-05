@@ -1,4 +1,4 @@
-package com.PigeonSkyRace.PigeonSkyRace.dto;
+package com.PigeonSkyRace.PigeonSkyRace.dto.request;
 
 import java.time.Duration;
 import java.time.LocalDate;
