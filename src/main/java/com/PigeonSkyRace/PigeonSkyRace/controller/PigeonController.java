@@ -24,9 +24,10 @@ public class PigeonController {
 
     @PostMapping
     public ResponseEntity<PigeonsResponse> registerPigeon( @RequestBody @Valid  PigeonsRequest pigeonRequest, Authentication authentication) {
-        String loggedInUserEmail = authentication.getName();
-        System.out.println("==========Logged-in user: " + authentication.getName());
-        System.out.println("==========User authorities: " + authentication.getAuthorities());        
+        String loggedInUserEmail = authentication.getName();    
+        System.out.println("Logged-in user: " + loggedInUserEmail);
+        System.out.println("User authorities: " + authentication.getAuthorities());
+    
         PigeonsResponse pigeonResponse = pigeonService.registerPigeon(pigeonRequest,loggedInUserEmail);
         return ResponseEntity.status(HttpStatus.CREATED).body(pigeonResponse);
     }

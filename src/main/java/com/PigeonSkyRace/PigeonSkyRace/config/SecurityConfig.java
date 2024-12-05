@@ -15,9 +15,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.PigeonSkyRace.PigeonSkyRace.security.CustomAuthenticationProvider;
+import com.PigeonSkyRace.PigeonSkyRace.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -27,31 +28,36 @@ public class SecurityConfig {
     private CustomAuthenticationProvider customAuthenticationProvider;
     @Autowired
     private JWTAuthFilter jwtAuthFilter;
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
-    // Configure HTTP security
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+        httpSecurity.csrf().disable()
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("api/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()
-                        .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/organizer/**").hasAnyAuthority("ORGANIZER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/organizer/**").hasRole("ORGANIZER")
                         .requestMatchers("/api/pigeons/**").hasAuthority("USER")
                         .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(customAuthenticationProvider).addFilterBefore(
-                        jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationManager(authenticationManager(httpSecurity))
+                .authenticationProvider(customAuthenticationProvider)
+                .addFilterAfter(jwtAuthFilter, BasicAuthenticationFilter.class);
         return httpSecurity.build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = http
-                .getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
-        return authenticationManagerBuilder.build();
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(customAuthenticationProvider) 
+                .userDetailsService(customUserDetailsService) 
+                .passwordEncoder(passwordEncoder())
+                .and()
+                .build();
     }
 
     @Bean
