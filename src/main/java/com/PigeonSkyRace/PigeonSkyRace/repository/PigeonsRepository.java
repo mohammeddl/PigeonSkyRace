@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 
-public interface PigeonsRepository extends JpaRepository<Pigeon, String> {
+public interface PigeonsRepository extends JpaRepository<Pigeon, Long> {
 Page<Pigeon> findAll(Pageable pageable);
 }

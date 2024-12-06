@@ -20,14 +20,15 @@ import org.springframework.stereotype.Component;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final CustomUserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Value("${spring.security.test.password-bypass:false}")
     private boolean isPasswordBypassEnabled;
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
-        
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         if (isPasswordBypassEnabled) {
