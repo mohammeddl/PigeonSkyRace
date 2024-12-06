@@ -33,6 +33,8 @@ public class SecurityConfig {
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
     private AccessDeniedHandler accessDeniedHandler;
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -46,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/pigeons/**").hasAuthority("USER")
                         .anyRequest().authenticated())
                 .exceptionHandling()
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
                 .and()
                 .httpBasic(Customizer.withDefaults())
