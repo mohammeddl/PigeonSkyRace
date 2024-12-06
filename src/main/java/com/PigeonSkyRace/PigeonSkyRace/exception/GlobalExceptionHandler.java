@@ -1,6 +1,6 @@
 package com.PigeonSkyRace.PigeonSkyRace.exception;
 
-import com.PigeonSkyRace.PigeonSkyRace.dto.ErrorDto;
+import com.PigeonSkyRace.PigeonSkyRace.dto.response.ErrorDto;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.AccessDeniedException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.CompetitionNotFinishedException;
 import com.PigeonSkyRace.PigeonSkyRace.exception.entitesCustomExceptions.NegativeDurationException;
