@@ -13,14 +13,8 @@ pipeline {
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image 'maven:3.8.8-eclipse-temurin-21'
-                    args '-v $HOME/.m2:/root/.m2'
-                }
-            }
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'docker run --rm -v $(pwd):/app -w /app maven:3.8.8-eclipse-temurin-21 mvn clean package -DskipTests'
             }
         }
 
