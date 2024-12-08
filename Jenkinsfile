@@ -13,6 +13,11 @@ pipeline {
         }
 
         stage('Build') {
+            agent {
+                docker {
+                    image 'maven:3.8.8-eclipse-temurin-21'
+                }
+            }
             steps {
                 sh 'mvn clean package -DskipTests'
             }
@@ -47,10 +52,13 @@ pipeline {
 
     post {
         always {
-            echo "Pipeline completed"
+            echo 'Pipeline completed'
+        }
+        success {
+            echo 'Pipeline succeeded'
         }
         failure {
-            echo "Pipeline failed"
+            echo 'Pipeline failed'
         }
     }
 }
