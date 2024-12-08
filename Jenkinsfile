@@ -48,8 +48,10 @@ pipeline {
         always {
             archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             junit '**/target/surefire-reports/*.xml'
+            echo 'Pipeline completed'
         }
         failure {
+            echo 'Pipeline failed'
             mail to: 'daali.22.ssss@gmail.com',
                     subject: "Failed Pipeline: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                     body: "Something went wrong. Check the Jenkins log."
