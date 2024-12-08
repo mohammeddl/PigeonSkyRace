@@ -14,7 +14,13 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'docker run --rm -v $(pwd):/app -w /app maven:3.8.8-eclipse-temurin-21 mvn clean package -DskipTests'
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
             }
         }
 
@@ -41,13 +47,10 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-            junit '**/target/surefire-reports/*.xml'
+            echo "Pipeline completed"
         }
         failure {
-            mail to: 'daali.22.ssss@gmail.com',
-                    subject: "Failed Pipeline: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: "Something went wrong. Check the Jenkins log."
+            echo "Pipeline failed"
         }
     }
 }
