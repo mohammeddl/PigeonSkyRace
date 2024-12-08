@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.8.8-eclipse-temurin-21'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         DOCKER_IMAGE = 'mohammeddl/pigeonskyrace-app'
@@ -13,19 +18,8 @@ pipeline {
         }
 
         stage('Build') {
-            agent {
-                docker {
-                    image 'maven:3.8.8-eclipse-temurin-21'
-                }
-            }
             steps {
                 sh 'mvn clean package -DskipTests'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'
             }
         }
 
@@ -37,7 +31,7 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: 'dockerhub-credentials', url: 'https://index.docker.io/v1/']) {
+                withDockerRegistry([credentialsId: 'dockerhub-credentials', url: '']) {
                     sh "docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
                 }
             }
@@ -52,13 +46,13 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline completed'
-        }
-        success {
-            echo 'Pipeline succeeded '
+            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            junit '**/target/surefire-reports/*.xml'
         }
         failure {
-            echo 'Pipeline failed'
+            mail to: 'daali.22.ssss@gmail.com',
+                    subject: "Failed Pipeline: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    body: "Something went wrong. Check the Jenkins log."
         }
     }
 }
