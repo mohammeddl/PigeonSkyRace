@@ -53,7 +53,7 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline completed project'
+            echo 'Pipeline completed successfully'
         }
         failure {
             echo 'Pipeline failed'
