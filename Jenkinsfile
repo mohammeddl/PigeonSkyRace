@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.8-eclipse-temurin-21'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         DOCKER_IMAGE = 'mohammeddl/pigeonskyrace-app'
@@ -46,15 +41,10 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-            junit '**/target/surefire-reports/*.xml'
             echo 'Pipeline completed'
         }
         failure {
             echo 'Pipeline failed'
-            mail to: 'daali.22.ssss@gmail.com',
-                    subject: "Failed Pipeline: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: "Something went wrong. Check the Jenkins log."
         }
     }
 }
