@@ -5,12 +5,14 @@ pipeline {
         DOCKER_IMAGE = 'mohammeddl/pigeonskyrace-app'
     }
 
-    stages {
         stage('Checkout') {
             steps {
+                script {
+                    deleteDir() 
+                }
                 git branch: 'Jenkins', url: 'https://github.com/mohammeddl/PigeonSkyRace.git'
-            }
-        }
+    }
+}
 
         stage('Build') {
             agent {
