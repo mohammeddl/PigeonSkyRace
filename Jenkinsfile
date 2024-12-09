@@ -69,11 +69,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    echo "DEBUG: Starting Deploy stage..."
-                }
-                sh "docker-compose down && docker-compose up -d"
-                script {
-                    echo "DEBUG: Deploy stage completed successfully!"
+                    echo "DEBUG: Stopping and removing existing containers..."
+                    sh '''
+                        docker-compose down || true
+                        docker-compose up -d
+                    '''
                 }
             }
         }
