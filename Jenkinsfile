@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'Jenkins', url: 'https://github.com/mohammeddl/PigeonSkyRace.git'
             }
         }
 
