@@ -8,7 +8,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                // Add git credentials and URL
+                git credentialsId: 'github-credentials', url: 'https://github.com/mohammeddl/PigeonSkyRace.git'
             }
         }
 
