@@ -1,7 +1,6 @@
 package com.PigeonSkyRace.PigeonSkyRace.config;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +37,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable()
-                .cors(Customizer.withDefaults())
+        httpSecurity.cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("api/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()

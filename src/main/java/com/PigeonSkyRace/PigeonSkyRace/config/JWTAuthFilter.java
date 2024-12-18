@@ -40,7 +40,6 @@ public class JWTAuthFilter extends OncePerRequestFilter {
 
         // basic auth
         if (authHeader.startsWith("Basic")) {
-
             filterChain.doFilter(request, response);
             return;
         }
