@@ -1,8 +1,7 @@
 package com.PigeonSkyRace.PigeonSkyRace.config;
 
 import jakarta.annotation.PostConstruct;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -16,45 +15,36 @@ import lombok.extern.slf4j.Slf4j;
 public class KeycloakConfig {
     
     @Value("${keycloak.auth-server-url}")
-    private String serverUrl;
-    
-    @Value("${keycloak.realm}")
-    private String realm;
+    private String authServerUrl;
     
     @Value("${keycloak.admin.username}")
     private String adminUsername;
     
     @Value("${keycloak.admin.password}")
     private String adminPassword;
-    
-    @Value("${keycloak.client-id}")
-    private String clientId;
 
     @PostConstruct
     public void init() {
-        log.info("KeycloakConfig initialized with URL: {}", serverUrl);
-        log.info("Realm: {}", realm);
-        log.info("ClientId: {}", clientId);
-        log.info("Admin Username: {}", adminUsername);
+        log.info("Initializing KeycloakConfig with URL: {}", authServerUrl);
     }
 
-    @Bean(name = "keycloakClient")
+    @Bean
     public Keycloak keycloak() {
-        log.info("Creating Keycloak instance");
-        
-        ResteasyClient client = ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
-            .disableTrustManager()
-            .build();
-    
-        return KeycloakBuilder.builder()
-            .serverUrl(serverUrl)
-            .realm(realm)
-            .grantType(OAuth2Constants.PASSWORD)
-            .username(adminUsername)
-            .password(adminPassword)
-            .clientId(clientId)
-            .resteasyClient(client)
-            .build();
+        log.info("Creating Keycloak admin client with URL: {}", authServerUrl);
+        try {
+            return KeycloakBuilder.builder()
+                .serverUrl(authServerUrl)
+                .realm("master")
+                .clientId("admin-cli")
+                .username(adminUsername)
+                .password(adminPassword)
+                .resteasyClient(new ResteasyClientBuilderImpl()
+                    .disableTrustManager()
+                    .build())
+                .build();
+        } catch (Exception e) {
+            log.error("Error creating Keycloak instance", e);
+            throw new RuntimeException("Failed to create Keycloak instance", e);
+        }
     }
-    
 }

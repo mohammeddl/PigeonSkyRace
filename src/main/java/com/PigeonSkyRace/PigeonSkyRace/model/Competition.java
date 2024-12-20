@@ -18,9 +18,9 @@ public class Competition {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "organizer_id")
-    private Organizer organizer;
+    // @ManyToOne
+    // @JoinColumn(name = "organizer_id")
+    // private Organizer organizer;
 
     @ManyToMany
     private List<User> participants;

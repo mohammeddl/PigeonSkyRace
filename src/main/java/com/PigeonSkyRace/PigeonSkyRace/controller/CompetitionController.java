@@ -25,7 +25,7 @@ public class CompetitionController {
     // @Operation(summary   = "Create a new competition", description = "Provide competition details to create a new competition")
     // @PostMapping("/create")
     // public Competition createCompetition(@RequestBody CompetitionDto competitionDto) {
-    //     return competitionService.createCompetition(competitionDto);
+    //     return null;
     // }
 
     // @Operation(summary = "Close a competition", description = "Close a competition and provide results")

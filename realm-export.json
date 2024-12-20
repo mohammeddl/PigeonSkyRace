@@ -1,0 +1,67 @@
+{
+  "id": "pigeon-race",
+  "realm": "pigeon-race",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "USER",
+        "description": "User role"
+      },
+      {
+        "name": "ADMIN",
+        "description": "Admin role"
+      },
+      {
+        "name": "ORGANIZER",
+        "description": "Organizer role"
+      }
+    ]
+  },
+  "defaultRoles": ["USER"],
+  "clients": [
+    {
+      "clientId": "pigeon-race-client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "fKLOPc1FFyK2vFGHtjZDnQtc8ytpO4YR",
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "authorizationServicesEnabled": true,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"],
+      "clientRoles": {
+        "realm-management": ["realm-admin"]
+      }
+    }
+  ],
+  "browserSecurityHeaders": {
+    "contentSecurityPolicy": "frame-src self; frame-ancestors self; object-src none;",
+    "xContentTypeOptions": "nosniff",
+    "xRobotsTag": "none",
+    "xFrameOptions": "SAMEORIGIN",
+    "xXSSProtection": "1; mode=block",
+    "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+  },
+  "smtpServer": {}
+}

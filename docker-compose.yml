@@ -12,6 +12,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: 0074
       KEYCLOAK_AUTH_SERVER_URL: https://keycloak:8443
       KEYCLOAK_REALM: pigeon-race
+      KEYCLOAK_RESOURCE: pigeon-race-client
       KEYCLOAK_CLIENT_ID: admin-cli
       KEYCLOAK_ADMIN_USERNAME: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -56,20 +57,28 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HTTPS_KEY_STORE_FILE: /opt/keycloak/conf/server.keystore.p12
-      KC_HTTPS_KEY_STORE_PASSWORD: password
-      KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://db:5432/pigeon
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: 0074
+      KC_HOSTNAME: keycloak
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
     command:
-      - start-dev
+      - start
+      - --import-realm
       - --https-key-store-password=password
       - --https-key-store-file=/opt/keycloak/conf/server.keystore.p12
     volumes:
       - ./keystore.p12:/opt/keycloak/conf/server.keystore.p12:ro
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:8443/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     depends_on:
       db:
         condition: service_healthy

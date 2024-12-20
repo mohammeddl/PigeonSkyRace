@@ -1,69 +1,128 @@
 package com.PigeonSkyRace.PigeonSkyRace.security;
 
+import jakarta.annotation.PostConstruct;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RealmsResource;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
-public class KeycloakInitializer implements InitializingBean {
-    private static final int MAX_RETRIES = 10;
-    private static final long RETRY_DELAY_MS = 5000; // 5 seconds
+public class KeycloakInitializer {
 
-    @Value("${keycloak.auth-server-url:http://keycloak:8080}")
-    private String keycloakServerUrl;
+    private final Keycloak keycloakAdmin;
 
-    @Value("${keycloak.realm:master}")
-    private String masterRealm;
+    @Value("${keycloak.realm}")
+    private String realm;
 
-    @Value("${keycloak.admin.username:admin}")
-    private String adminUsername;
+    public KeycloakInitializer(Keycloak keycloakAdmin) {
+        this.keycloakAdmin = keycloakAdmin;
+    }
 
-    @Value("${keycloak.admin.password:admin}")
-    private String adminClientId;
+    @PostConstruct
+    public void init() {
+        log.info("Starting Keycloak initialization...");
+        waitForKeycloak();
+        initializeRealm();
+        initializeRoles();
+    }
 
-    @Value("${keycloak.admin.password:admin}")
-    private String adminPassword;
-
-    private Keycloak keycloakAdmin;
-
-    @Override
-    public void afterPropertiesSet() {
+    private void waitForKeycloak() {
+        int maxRetries = 30;
         int retryCount = 0;
-        while (retryCount < MAX_RETRIES) {
+        boolean connected = false;
+
+        while (!connected && retryCount < maxRetries) {
             try {
-                initializeKeycloak();
-                
-                return; 
+                keycloakAdmin.serverInfo().getInfo();
+                connected = true;
+                log.info("Successfully connected to Keycloak server");
             } catch (Exception e) {
                 retryCount++;
-                if (retryCount == MAX_RETRIES) {
-                    throw new RuntimeException("Failed to initialize Keycloak after " + MAX_RETRIES + " attempts", e);
-                }
+                log.warn("Waiting for Keycloak to be ready... Attempt {}/{}", retryCount, maxRetries);
                 try {
-                    Thread.sleep(RETRY_DELAY_MS);
+                    TimeUnit.SECONDS.sleep(2);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    throw new RuntimeException("Interrupted while waiting to retry Keycloak initialization", ie);
+                    throw new RuntimeException("Interrupted while waiting for Keycloak", ie);
                 }
             }
         }
+
+        if (!connected) {
+            throw new RuntimeException("Could not connect to Keycloak after " + maxRetries + " attempts");
+        }
     }
 
-    private void initializeKeycloak() {
-        this.keycloakAdmin = KeycloakBuilder.builder()
-                .serverUrl(keycloakServerUrl)
-                .realm(masterRealm)
-                .username(adminUsername)
-                .password(adminPassword)
-                .clientId(adminClientId)
-                .build();
+    private void initializeRealm() {
+        try {
+            RealmsResource realmsResource = keycloakAdmin.realms();
+            Optional<RealmRepresentation> existingRealm = realmsResource.findAll().stream()
+                .filter(r -> r.getRealm().equals(realm))
+                .findFirst();
+
+            if (existingRealm.isEmpty()) {
+                log.info("Creating new realm: {}", realm);
+                RealmRepresentation newRealm = new RealmRepresentation();
+                newRealm.setRealm(realm);
+                newRealm.setEnabled(true);
+                newRealm.setRegistrationAllowed(true);
+                newRealm.setSslRequired("external");
+                
+                realmsResource.create(newRealm);
+                log.info("Successfully created realm: {}", realm);
+                
+                // Wait a moment for the realm to be fully created
+                TimeUnit.SECONDS.sleep(2);
+            } else {
+                log.info("Realm {} already exists", realm);
+            }
+        } catch (Exception e) {
+            log.error("Error initializing realm", e);
+            throw new RuntimeException("Failed to initialize realm: " + e.getMessage(), e);
+        }
     }
 
-   
+    private void initializeRoles() {
+        try {
+            RealmResource realmResource = keycloakAdmin.realm(realm);
+            List<String> defaultRoles = List.of("USER", "ADMIN", "ORGANIZER");
+
+            for (String roleName : defaultRoles) {
+                try {
+                    RoleRepresentation existingRole = null;
+                    try {
+                        existingRole = realmResource.roles().get(roleName).toRepresentation();
+                    } catch (Exception e) {
+                        log.debug("Role {} doesn't exist yet", roleName);
+                    }
+
+                    if (existingRole == null) {
+                        RoleRepresentation role = new RoleRepresentation();
+                        role.setName(roleName);
+                        role.setDescription("Role for " + roleName);
+                        log.info("Creating role: {}", roleName);
+                        realmResource.roles().create(role);
+                        log.info("Successfully created role: {}", roleName);
+                        
+                        // Wait a moment between role creations
+                        TimeUnit.MILLISECONDS.sleep(500);
+                    }
+                } catch (Exception e) {
+                    log.error("Error creating role: {}", roleName, e);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error initializing roles", e);
+            throw new RuntimeException("Failed to initialize roles: " + e.getMessage(), e);
+        }
+    }
 }
