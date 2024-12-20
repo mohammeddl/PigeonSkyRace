@@ -1,14 +1,16 @@
 package com.PigeonSkyRace.PigeonSkyRace.controller;
 
+import java.security.Principal;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.PigeonSkyRace.PigeonSkyRace.dto.request.UserRequest;
-import com.PigeonSkyRace.PigeonSkyRace.dto.response.LoginResponse;
 import com.PigeonSkyRace.PigeonSkyRace.dto.response.UserResponse;
 import com.PigeonSkyRace.PigeonSkyRace.service.UserService;
 
@@ -21,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-
     private final UserService userService;
 
     @PostMapping("/register")
@@ -30,10 +31,11 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @Valid UserRequest userRequest) {
-        LoginResponse loginResponse = userService.login(userRequest);
-        return ResponseEntity.ok(loginResponse);
+    // Remove the login endpoint as it will be handled by Keycloak
+    
+    @GetMapping("/user-info")
+    public ResponseEntity<UserResponse> getUserInfo(Principal principal) {
+        UserResponse userResponse = userService.getUserDetails(principal.getName());
+        return ResponseEntity.ok(userResponse);
     }
-
 }

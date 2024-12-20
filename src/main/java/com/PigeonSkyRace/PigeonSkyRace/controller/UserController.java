@@ -22,10 +22,10 @@ public class UserController {
 
     private final UserService userService;
 
-    @PutMapping("/update/{userId}")
-    public ResponseEntity<UserResponse> updateUserRole(@PathVariable Long userId, @RequestBody UserUpdate userUpdate) {
-        UserResponse updatedUser = userService.updateUser(userId, userUpdate);
-        return ResponseEntity.ok(updatedUser);
-    }
+    // @PutMapping("/update/{userId}")
+    // public ResponseEntity<UserResponse> updateUserRole(@PathVariable Long userId, @RequestBody UserUpdate userUpdate) {
+    //     UserResponse updatedUser = userService.updateUser(userId, userUpdate);
+    //     return ResponseEntity.ok(updatedUser);
+    // }
 
 }
